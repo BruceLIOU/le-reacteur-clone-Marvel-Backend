@@ -14,7 +14,7 @@ name	search a character by name	No */
 router.get("/characters", async (req, res) => {
   try {
     const response = await axios.get(
-      `${process.env.API_URL}/characters?apiKey=${process.env.API_KEY}&skip=${req.query.skip}&limit=${req.query.limit}`
+      `${process.env.API_URL}/characters?apiKey=${process.env.API_KEY}&skip=${req.query.skip}&limit=${req.query.limit}&name=${req.query.name}`
     );
     res.status(200).json(response.data);
   } catch (error) {
