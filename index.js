@@ -10,7 +10,7 @@ app.use(cors());
 
 // Connection DB
 mongoose
-  .connect(process.env.MANGODB_URI_DEV, {
+  .connect(process.env.MANGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -21,8 +21,10 @@ mongoose
 // Immport routes
 const charactersRoutes = require("./routes/character");
 const comicsRoutes = require("./routes/comics");
+const usersRoutes = require("./routes/user");
 app.use(charactersRoutes);
 app.use(comicsRoutes);
+app.use(usersRoutes);
 
 app.get("/", (req, res) => {
   res.status(201).json("Bienvenue sur le clone de MARVEL");
