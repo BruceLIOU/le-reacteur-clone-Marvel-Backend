@@ -22,19 +22,21 @@ router.post("/user/signup", async (req, res) => {
         const hash = SHA256(req.fields.password + salt).toString(encBase64);
 
         const newUser = new User({
-          username: req.fields.username,
           email: req.fields.email,
           token: token,
           hash: hash,
           salt: salt,
+          account: {
+            username: req.fields.username,
+          },
         });
 
         await newUser.save();
         res.status(200).json({
           _id: newUser._id,
-          username: newUser.username,
           email: newUser.email,
           token: newUser.token,
+          account: newUser.account,
         });
       } else {
         res.status(400).json({ message: "Missing parameters" });
@@ -59,7 +61,7 @@ router.post("/user/login", async (req, res) => {
         res.status(200).json({
           _id: user._id,
           token: user.token,
-          username: user.username,
+          account: user.account,
         });
       } else {
         res.status(401).json({ error: "Unauthorized" });
