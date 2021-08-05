@@ -8,9 +8,6 @@ const app = express();
 app.use(formidable({ multiples: true }));
 app.use(cors());
 
-const apiUrl = process.env.API_URL;
-const apiKey = process.env.API_KEY;
-
 // Connection DB
 mongoose
   .connect(process.env.MANGODB_URI_DEV, {
@@ -22,8 +19,8 @@ mongoose
   .catch(() => console.log("Connexion à MongoDB échouée !"));
 
 // Immport routes
-const charactersRoutes = require("./routes/Characters/character");
-const comicsRoutes = require("./routes/Comics/comics");
+const charactersRoutes = require("./routes/character");
+const comicsRoutes = require("./routes/comics");
 app.use(charactersRoutes);
 app.use(comicsRoutes);
 

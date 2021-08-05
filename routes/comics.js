@@ -1,11 +1,7 @@
 // Import packages
 const express = require("express");
-const md5 = require("md5");
 const axios = require("axios");
 const router = express.Router();
-require("dotenv").config();
-
-const app = express();
 
 // route GET /comics
 // Ex : https://lereacteur-marvel-api.herokuapp.com/comics?apiKey=YOUR_API_KEY
@@ -18,9 +14,8 @@ title	search a comic by title	No */
 router.get("/comics", async (req, res) => {
   try {
     const response = await axios.get(
-      `${process.env.API_URL}/comics?apiKey=${process.env.API_KEY}`
+      `${process.env.API_URL}/comics?apiKey=${process.env.API_KEY}&skip=${req.query.skip}&limit=${req.query.limit}`
     );
-    console.log(response.data.results[0]);
     res.status(200).json(response.data);
   } catch (error) {
     //console.log(error.message);
@@ -43,6 +38,7 @@ router.get("/comics/:characterId", async (req, res) => {
     const response = await axios.get(
       `${process.env.API_URL}/comics/${req.query.id}?apiKey=${process.env.API_KEY}`
     );
+    console.log(response.data);
     res.status(200).json(response.data);
   } catch (error) {
     //console.log(error.message);
