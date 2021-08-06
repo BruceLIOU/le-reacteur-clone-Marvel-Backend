@@ -5,7 +5,12 @@ const User = mongoose.model("User", {
     unique: true,
     type: String,
   },
-  username: { type: String, required: true },
+  account: {
+    username: {
+      required: true,
+      type: String,
+    },
+  },
   token: String,
   hash: String,
   salt: String,

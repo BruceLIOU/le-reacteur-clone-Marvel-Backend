@@ -27,7 +27,9 @@ router.post("/user/signup", async (req, res) => {
           token: token,
           hash: hash,
           salt: salt,
-          username: req.fields.username,
+          account: {
+            username: req.fields.username,
+          },
         });
 
         await newUser.save();
@@ -35,7 +37,7 @@ router.post("/user/signup", async (req, res) => {
           _id: newUser._id,
           email: newUser.email,
           token: newUser.token,
-          username: newUser.username,
+          account: newUser.account,
         });
       } else {
         console.log(newUser);
@@ -61,7 +63,7 @@ router.post("/user/login", async (req, res) => {
         res.status(200).json({
           _id: user._id,
           token: user.token,
-          username: user.username,
+          account: user.account,
         });
       } else {
         res.status(401).json({ error: "Unauthorized" });
