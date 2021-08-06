@@ -5,12 +5,7 @@ const User = mongoose.model("User", {
     unique: true,
     type: String,
   },
-  account: {
-    username: {
-      required: true,
-      type: String,
-    },
-  },
+  username: { type: String, required: true },
   token: String,
   hash: String,
   salt: String,

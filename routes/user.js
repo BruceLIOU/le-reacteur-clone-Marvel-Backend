@@ -4,6 +4,7 @@ const router = express.Router();
 const uid2 = require("uid2");
 const SHA256 = require("crypto-js/sha256");
 const encBase64 = require("crypto-js/enc-base64");
+const isAuthenticated = require("../middlewares/isAuthenticated");
 
 // Import models
 const User = require("../models/User");
@@ -26,9 +27,7 @@ router.post("/user/signup", async (req, res) => {
           token: token,
           hash: hash,
           salt: salt,
-          account: {
-            username: req.fields.username,
-          },
+          username: req.fields.username,
         });
 
         await newUser.save();
@@ -36,14 +35,15 @@ router.post("/user/signup", async (req, res) => {
           _id: newUser._id,
           email: newUser.email,
           token: newUser.token,
-          account: newUser.account,
+          username: newUser.username,
         });
       } else {
+        console.log(newUser);
         res.status(400).json({ message: "Missing parameters" });
       }
     }
   } catch (error) {
-    //console.log(error.message);
+    console.log(error.message);
     res.status(400).json({ error: error.message });
   }
 });
@@ -61,7 +61,7 @@ router.post("/user/login", async (req, res) => {
         res.status(200).json({
           _id: user._id,
           token: user.token,
-          account: user.account,
+          username: user.username,
         });
       } else {
         res.status(401).json({ error: "Unauthorized" });
