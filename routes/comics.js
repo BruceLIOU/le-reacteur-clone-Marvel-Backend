@@ -33,7 +33,7 @@ characterId	characters mongoDB id	Yes
 Query
 Query	Info	Required
 apiKey	API key received	Yes*/
-router.get("/comics/:characterId", async (req, res) => {
+router.get("/comics/:id", async (req, res) => {
   try {
     const response = await axios.get(
       `${process.env.API_URL}/comics/${req.query.id}?apiKey=${process.env.API_KEY}`
