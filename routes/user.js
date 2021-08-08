@@ -77,133 +77,31 @@ router.post("/user/login", async (req, res) => {
   }
 });
 
-// route POST /user/favorite/character
-router.post("/user/favorite/character", isAuthenticated, async (req, res) => {
+router.put("/user/favorite/character", isAuthenticated, async (req, res) => {
   try {
-    const { characterId, id } = req.fields;
-    if (id) {
-      //search the user
-      const userToUpdate = await User.findById(id);
-      // if characterId is new add to favorite
-      if (userToUpdate.favorite_characters.length === 0) {
-        const response = await axios.get(
-          `${process.env.API_URL}/comics/${characterId}`
-        );
-        userToUpdate.favorite_characters.push({
-          thumbnail: response.data.thumbnail,
-          _id: characterId,
-          name: response.data.name,
-          description: response.data.description,
-          comics: response.data.comics,
-        });
-        await userToUpdate.save();
-        res.status(200).json({
-          _id: userToUpdate._id,
-          favorite_characters: userToUpdate.favorite_characters,
-          favorite_comics: userToUpdate.favorite_comics,
-        });
-      } else if (userToUpdate.favorite_characters.length > 0) {
-        const response = await axios.get(
-          `${process.env.API_URL}/comics/${characterId}`
-        );
-        const found = userToUpdate.favorite_characters.find(
-          (element) => element._id === characterId
-        );
-        if (found) {
-          //if characterId found in user favorite list
-          userToUpdate.favorite_characters.map((character, index) => {
-            if (character._id === characterId) {
-              userToUpdate.favorite_characters.splice(index, 1);
-            }
-          });
-        } else {
-          userToUpdate.favorite_characters.push({
-            thumbnail: response.data.thumbnail,
-            _id: characterId,
-            name: response.data.name,
-            description: response.data.description,
-            comics: response.data.comics,
-          });
-        }
-        await userToUpdate.save();
-        res.status(200).json({
-          _id: userToUpdate._id,
-          favorite_characters: userToUpdate.favorite_characters,
-          favorite_comics: userToUpdate.favorite_comics,
-        });
+    const user = await User.findOne({ token: req.fields.token });
+    for (let i = 0; i < user.charactersFavorites.length; i++) {
+      if (user.charactersFavorites[i]._id === req.fields.favorite._id) {
+        return res.status(400).json("Already put in favorites");
       }
     }
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-// route GET /user/favorites/comic
-router.post("/user/favorite/comic", isAuthenticated, async (req, res) => {
-  try {
-    const { comicId, id, title, path, extension, description } = req.fields;
-
-    if (id) {
-      const userToUpdate = await User.findById(id);
-      if (userToUpdate.favorite_comics.length === 0) {
-        userToUpdate.favorite_comics.push({
-          thumbnail: {
-            path: path,
-            extension: extension,
-          },
-          _id: comicId,
-          title: title,
-          description: description !== "null" ? description : " ",
-        });
-        await userToUpdate.save();
-        res.status(200).json({
-          _id: userToUpdate._id,
-          favorite_characters: userToUpdate.favorite_characters,
-          favorite_comics: userToUpdate.favorite_comics,
-        });
-      } else if (userToUpdate.favorite_comics.length > 0) {
-        const found = userToUpdate.favorite_comics.find(
-          (element) => element._id === comicId
-        );
-        if (found) {
-          userToUpdate.favorite_comics.map((comic, index) => {
-            if (comic._id === comicId) {
-              userToUpdate.favorite_comics.splice(index, 1);
-            }
-          });
-        } else {
-          userToUpdate.favorite_comics.push({
-            thumbnail: {
-              path: path,
-              extension: extension,
-            },
-            _id: comicId,
-            title: title,
-            description: description !== "null" ? description : " ",
-          });
-        }
-        await userToUpdate.save();
-        res.status(200).json({
-          _id: userToUpdate._id,
-          favorite_characters: userToUpdate.favorite_characters,
-          favorite_comics: userToUpdate.favorite_comics,
-        });
+    for (let i = 0; i < user.comicsFavorites.length; i++) {
+      if (user.comicsFavorites[i]._id === req.fields.favorite._id) {
+        return res.status(400).json("Already put in favorites");
       }
     }
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
+    if (req.fields.favorite._id && req.fields.favorite.name) {
+      user.charactersFavorites.push(req.fields.favorite);
+      // Tell at Mongoose we modified the array : charactersFavorites.
+      user.markModified("charactersFavorites");
+    } else if (req.fields.favorite.title && req.fields.favorite._id) {
+      user.comicsFavorites.push(req.fields.favorite);
+      // Tell at Mongoose we modified the array : comicsFavorites.
+      user.markModified("comicsFavorites");
+    }
 
-// route GET /user/favorites/:_id
-router.get("/user/favorites/:_id", async (req, res) => {
-  try {
-    const user = await User.findById(req.params._id);
-    res.status(200).json({
-      _id: user._id,
-      favorite_characters: user.favorite_characters,
-      favorite_comics: user.favorite_comics,
-    });
+    await user.save();
+    res.status(200).json("favory added");
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
